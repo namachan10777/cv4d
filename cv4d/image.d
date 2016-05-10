@@ -5,8 +5,9 @@ module cv4d.image;
 
 import cv4d.opencv;
 import cv4d.exception, cv4d.matrix, cv4d._internal.misc;
+import std.conv : to;
 
-private void error(string msg, string file = __FILE__, size_t line = __LINE__) pure
+private void error(string msg, string file = __FILE__, int line = __LINE__) pure
 {
 	throw new CvException(msg, file, line);
 }
@@ -363,7 +364,7 @@ public:
 	this(in void[] imagedata,
 	     int color = CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR)
 	{
-		auto m = cvCreateMatHeader(1, imagedata.length, CV_MAKETYPE(CV_8U,1));
+		auto m = cvCreateMatHeader(1, imagedata.length.to!int, CV_MAKETYPE(CV_8U,1).to!int);
 		scope (exit) cvReleaseMat(&m);
 		cvSetData(m, cast(void*)imagedata.ptr, m.step);
 		_image = cvDecodeImage(m, color);
@@ -1632,7 +1633,7 @@ public:
 		{
 			rangeptrs[i] = r.dup.ptr;
 		}
-		_histogram = cvCreateHist(sizes.length, sizes.dup.ptr, type,
+		_histogram = cvCreateHist(sizes.length.to!int, sizes.dup.ptr, type,
 		                           rangeptrs.ptr, uniform);
 	}
 	

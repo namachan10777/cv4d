@@ -5,6 +5,8 @@ module cv4d.exception;
 
 import cv4d.opencv;
 import std.windows.charset;
+import std.string : toStringz,fromStringz;
+import std.conv : to;
 
 /*******************************************************************************
  * OpenCVから投げられる例外
@@ -15,7 +17,7 @@ class CvException: Exception
 	char[] func = null;
 	
 	
-	this(string msg, string file=__FILE__, int line=__LINE__) pure
+	this(string msg, string file=__FILE__, ulong line=__LINE__) pure
 	{
 		super(msg, file, line, null);
 	}
@@ -47,9 +49,15 @@ private:
 	                               int line, void* userdata )
 	{
 		auto hEr = cast(ErrorHandler*)userdata;
-		auto funcName = fromMBSz(cast(immutable)func_name);
-		auto errorMsg = fromMBSz(cast(immutable)err_msg);
-		auto fileName = fromMBSz(cast(immutable)file_name);
+		version(Windows){
+			auto funcName = fromMBSz(cast(immutable)func_name);
+			auto errorMsg = fromMBSz(cast(immutable)err_msg);
+			auto fileName = fromMBSz(cast(immutable)file_name);
+		}else{
+			auto funcName = func_name.fromStringz.to!string;
+			auto errorMsg = err_msg.fromStringz.to!string;
+			auto fileName = file_name.fromStringz.to!string; 
+		}
 		return hEr._handler(errorMsg, status, funcName, fileName, line);
 	}
 	
